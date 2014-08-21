@@ -1,0 +1,23 @@
+---
+# stable or latest
+jenkins_version: stable
+jenkins_cli_path: /usr/local/lib/jenkins
+jenkins_cli_url: 'http://localhost:8080'
+jenkins_user_home: /var/lib/jenkins
+
+jenkins_plugins:
+- git
+- github
+- subversion
+- thinBackup
+- greenballs
+- ws-cleanup
+- parameterized-trigger
+
+jenkins_install_plugins: 'yes'
+jenkins_update_plugins: 'yes'
+
+jenkins_pkg_state: installed
+jenkins_service_enabled: 'yes'
+jenkins_service_state: started
+jenkins_update_plugins: 'yes'

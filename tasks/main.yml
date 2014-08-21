@@ -1,0 +1,90 @@
+---
+- name: configure jenkins variables
+  include_vars: '{{ jenkins_version }}.yml'
+  tags:
+  - packages
+  - jenkins-plugins
+
+- name: import jenkins-ci.org gpg key
+  rpm_key: key='http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key'
+  when: ansible_os_family == 'RedHat'
+  tags: packages
+
+- name: configure yum repo of jenkins-ci.org
+  get_url: url='http://pkg.jenkins-ci.org/{{ jenkins_redhat_version }}/jenkins.repo' dest=/etc/yum.repos.d/jenkins.repo mode=0644
+  when: ansible_os_family == 'RedHat'
+  tags: packages
+
+- name: install the required packages in RedHat derivatives
+  yum: name=jenkins state={{ jenkins_pkg_state }}
+  when: ansible_os_family == 'RedHat'
+  tags: packages
+
+- name: import jenkins-ci.org gpg key
+  apt_key: url='http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key'
+  when: ansible_os_family == 'Debian'
+  tags: packages
+
+- name: install the required packages in Debian derivatives
+  apt: name=jenkins state={{ jenkins_pkg_state }}
+  when: ansible_os_family == 'Debian'
+  tags: packages
+
+- name: ensure Jenkins is started/stopped
+  service: name=jenkins state={{ jenkins_service_state }} enabled={{ jenkins_service_enabled }}
+  tags: service
+
+- name: wait for Jenkins to be accessable
+  wait_for: port=8080 delay=10
+  when: jenkins_service_state != "stopped"
+
+- name: create jenkins-cli path
+  file: path={{ jenkins_cli_path }}/ state=directory
+
+- name: install Jenkins cli
+  get_url: url='{{ jenkins_cli_url }}/jnlpJars/jenkins-cli.jar' dest={{ jenkins_cli_path }}/jenkins-cli.jar
+  ignore_errors: yes
+  tags: packages
+
+- name: install Jenkins plugin helper script
+  template: src=jenkins-plugins.j2 dest=/usr/local/bin/jenkins-plugins
+  tags: 
+  - packages
+  - jenkins-plugins
+
+- name: get installed Jenkins plugins
+  shell: /usr/local/bin/jenkins-plugins list
+  register: plugins_to_install
+  ignore_errors: yes
+  changed_when: False
+  tags:
+  - packages
+  - jenkins-plugins
+
+- name: install missing Jenkins plugins
+  shell: /usr/local/bin/jenkins-plugins install {{ item }}
+  notify: cli safe-restart jenkins
+  with_items: jenkins_plugins
+  when: jenkins_install_plugins == 'yes' and item not in jenkins_plugins and plugins_to_install|success
+  tags:
+  - packages
+  - jenkins-plugins
+
+- name: check for Jenkins plugin updates
+  shell: /usr/local/bin/jenkins-plugins list-outdated
+  register: plugins_to_update
+  changed_when: plugins_to_update.stdout_lines|count > 0
+  ignore_errors: yes
+  tags:
+  - packages
+  - jenkins-plugins
+
+- name: update outdated Jenkins plugins
+  shell: /usr/local/bin/jenkins-plugins install {{ item }}
+  notify: cli safe-restart jenkins
+  with_items: plugins_to_update.stdout_lines
+  when: jenkins_update_plugins == 'yes' and plugins_to_update|success
+  tags:
+  - packages
+  - jenkins-plugins
+
