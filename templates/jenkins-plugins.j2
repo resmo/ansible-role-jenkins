@@ -12,9 +12,8 @@ elif [ "$1" == "install" ]; then
 elif [ "$1" == "safe-restart" ]; then
     $cmd -i {{ jenkins_user_home }}/.ssh/id_rsa safe-restart
     exit 0
-fi
 elif [ "$1" == "safe-reload" ]; then
-    $cmd -i {{ jenkins_user_home }}/.ssh/id_rsa safe-restart
+    $cmd -i {{ jenkins_user_home }}/.ssh/id_rsa safe-reload
     exit 0
 fi
 exit 1
