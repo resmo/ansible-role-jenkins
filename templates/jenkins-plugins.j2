@@ -16,4 +16,5 @@ elif [ "$1" == "safe-reload" ]; then
     $cmd -i {{ jenkins_user_home }}/.ssh/id_rsa safe-reload
     exit 0
 fi
+echo Usage: $0 [list-outdated|list|install|safe-restart|safe-reload]
 exit 1
