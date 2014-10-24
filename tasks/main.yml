@@ -47,7 +47,7 @@
   tags: packages
 
 - name: install Jenkins plugin helper script
-  template: src=jenkins-plugins.j2 dest=/usr/local/bin/jenkins-plugins
+  template: src=jenkins-plugins.j2 dest=/usr/local/bin/jenkins-plugins mode=0750
   tags: 
   - packages
   - jenkins-plugins
