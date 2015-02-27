@@ -56,6 +56,7 @@
   shell: /usr/local/bin/jenkins-plugins list
   register: plugins_to_install
   ignore_errors: yes
+  always_run: yes
   changed_when: False
   tags:
   - packages
@@ -75,6 +76,7 @@
   register: plugins_to_update
   changed_when: plugins_to_update.stdout_lines|count > 0
   ignore_errors: yes
+  always_run: yes
   tags:
   - packages
   - jenkins-plugins
@@ -87,4 +89,3 @@
   tags:
   - packages
   - jenkins-plugins
-
