@@ -56,8 +56,8 @@
   shell: /usr/local/bin/jenkins-plugins list
   register: plugins_to_install
   ignore_errors: yes
+  changed_when: false
   always_run: yes
-  changed_when: False
   tags:
   - packages
   - jenkins-plugins
@@ -74,8 +74,8 @@
 - name: check for Jenkins plugin updates
   shell: /usr/local/bin/jenkins-plugins list-outdated
   register: plugins_to_update
-  changed_when: plugins_to_update.stdout_lines|count > 0
   ignore_errors: yes
+  changed_when: false
   always_run: yes
   tags:
   - packages
