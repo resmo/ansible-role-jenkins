@@ -34,12 +34,13 @@
   service: name=jenkins state={{ jenkins_service_state }} enabled={{ jenkins_service_enabled }}
   tags: service
 
+- name: create jenkins-cli path
+  file: path={{ jenkins_cli_path }}/ state=directory
+
 - name: wait for Jenkins to be accessable
   wait_for: port=8080 delay=10
   when: jenkins_service_state != "stopped"
 
-- name: create jenkins-cli path
-  file: path={{ jenkins_cli_path }}/ state=directory
 
 - name: install Jenkins cli
   get_url: url='{{ jenkins_cli_url }}/jnlpJars/jenkins-cli.jar' dest={{ jenkins_cli_path }}/jenkins-cli.jar
