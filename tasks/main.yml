@@ -41,10 +41,18 @@
   wait_for: port=8080 delay=10
   when: jenkins_service_state != "stopped"
 
+- name: wait for Jenkins API to response properly
+  uri: url={{ jenkins_cli_url }}/api/json return_content=yes
+  register: webpage
+  until: webpage|success
+  retries: 10
+  delay: 10
+  when: jenkins_service_state != "stopped"
+  tags: packages
 
 - name: install Jenkins cli
   get_url: url='{{ jenkins_cli_url }}/jnlpJars/jenkins-cli.jar' dest={{ jenkins_cli_path }}/jenkins-cli.jar
-  ignore_errors: yes
+  when: jenkins_service_state != "stopped"
   tags: packages
 
 - name: install Jenkins plugin helper script
