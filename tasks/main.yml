@@ -2,13 +2,12 @@
 - name: configure jenkins variables
   include_vars: "{{ jenkins_version }}.yml"
   tags:
-  - packages
   - jenkins-plugins
 
 - import_tasks: redhat.yml
 - import_tasks: debian.yml
 
-- name: ensure Jenkins is started/stopped
+- name: ensure Jenkins is started
   service:
     name: jenkins
     state: started
@@ -29,56 +28,11 @@
   retries: 10
   delay: 10
 
-- name: install Jenkins cli
-  get_url:
-    url: "{{ jenkins_cli_url }}/jnlpJars/jenkins-cli.jar"
-    dest: "{{ jenkins_cli_path }}/jenkins-cli.jar"
-
-- name: install Jenkins plugin helper script
-  template:
-    src: jenkins-plugins.j2
-    dest: /usr/local/bin/jenkins-plugins
-    mode: 0750
-  tags:
-  - jenkins-plugins
-
-- name: get installed Jenkins plugins
-  shell: /usr/local/bin/jenkins-plugins list
-  register: jenkins_plugins_installed
-  ignore_errors: yes
-  changed_when: no
-  check_mode: no
-  tags:
-  - jenkins-plugins
-
-- name: Outdated plugins
-  debug:
-    var: jenkins_plugins_installed.stdout_lines
-
-- name: install missing Jenkins plugins
-  shell: /usr/local/bin/jenkins-plugins install {{ item }}
-  notify: cli safe-restart jenkins
+- name: install plugins
+  jenkins_plugin:
+    name: "{{ item.name }}"
+    url: "{{ jenkins_cli_url }}"
+    state: "{{ item.state | default(jenkins_plugins_state) }}"
+    version: "{{ item.version | default(omit) }}"
+    with_dependencies: "{{ item.with_dependencies | default(omit) }}"
   loop: "{{ jenkins_plugins }}"
-  when: jenkins_install_plugins == true and jenkins_plugins_installed is success and item not in jenkins_plugins_installed.stdout_lines
-  tags:
-  - jenkins-plugins
-
-- name: check for Jenkins plugin updates
-  command: /usr/local/bin/jenkins-plugins list-outdated
-  register: plugins_to_update
-  changed_when: no
-  check_mode: no
-  tags:
-  - jenkins-plugins
-
-- name: Outdated plugins
-  debug:
-    var: plugins_to_update.stdout_lines
-
-- name: update outdated Jenkins plugins
-  shell: /usr/local/bin/jenkins-plugins install {{ item }}
-  notify: cli safe-restart jenkins
-  loop: "{{ plugins_to_update.stdout_lines }}"
-  when: jenkins_update_plugins == true and plugins_to_update is success
-  tags:
-  - jenkins-plugins
