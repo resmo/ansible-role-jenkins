@@ -17,7 +17,6 @@ jenkins_plugins:
 jenkins_install_plugins: 'yes'
 jenkins_update_plugins: 'yes'
 
-jenkins_pkg_state: installed
+jenkins_pkg_state: present
 jenkins_service_enabled: 'yes'
 jenkins_service_state: started
-jenkins_update_plugins: 'yes'
