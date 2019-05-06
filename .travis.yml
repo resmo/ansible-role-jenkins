@@ -6,7 +6,7 @@ before_install:
  - sudo apt-get install -qq python-apt python-pycurl
 install:
   - pip install ansible
-  - echo -e '[defaults]\nroles_path = ../\inventory = ./tests/inventory' > ansible.cfg
+  - echo -e '[defaults]\nroles_path = ../\ninventory = ./tests/inventory' > ansible.cfg
 script:
   - ansible-playbook --syntax-check tests/role.yml
   - ansible-playbook --become -v --diff tests/role.yml
