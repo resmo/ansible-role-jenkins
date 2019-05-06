@@ -6,17 +6,15 @@ jenkins_cli_url: 'http://localhost:8080'
 jenkins_user_home: /var/lib/jenkins
 
 jenkins_plugins:
-- git
-- github
-- subversion
-- thinBackup
-- greenballs
-- ws-cleanup
-- parameterized-trigger
+- name: git
+- name: github
+- name: subversion
+- name: thinBackup
+- name: greenballs
+- name: ws-cleanup
+- name: parameterized-trigger
 
-jenkins_install_plugins: 'yes'
-jenkins_update_plugins: 'yes'
+jenkins_install_plugins: yes
+jenkins_plugins_state: present
 
 jenkins_pkg_state: present
-jenkins_service_enabled: 'yes'
-jenkins_service_state: started

@@ -1,0 +1,16 @@
+---
+- name: Debian derivatives install
+  block:
+  - name: import jenkins-ci.org gpg key in Debian derivatives
+    apt_key:
+      url: http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key
+
+  - name: configure jenkins repo for Debian derivatives
+    apt_repository:
+      repo: deb https://pkg.jenkins.io/{{ jenkins_debian_version }} binary/
+
+  - name: install the required packages in Debian derivatives
+    apt:
+      name: jenkins
+      state: "{{ jenkins_pkg_state }}"
+  when: ansible_os_family == 'Debian'
