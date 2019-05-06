@@ -1,0 +1,18 @@
+---
+- name: RedHat derivatives install
+  block:
+  - name: import jenkins-ci.org gpg key
+    rpm_key:
+      key: http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
+
+  - name: configure yum repo of jenkins-ci.org
+    get_url:
+      url: "http://pkg.jenkins-ci.org/{{ jenkins_redhat_version }}/jenkins.repo"
+      dest: /etc/yum.repos.d/jenkins.repo
+      mode: 0644
+
+  - name: install the required packages in RedHat derivatives
+    yum:
+      name: jenkins
+      state: "{{ jenkins_pkg_state }}"
+  when: ansible_os_family == 'RedHat'
