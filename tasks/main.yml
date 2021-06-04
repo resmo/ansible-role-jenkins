@@ -14,7 +14,8 @@
 - name: configure yum repo of jenkins-ci.org
   get_url:
     url: "http://pkg.jenkins-ci.org/{{ jenkins_redhat_version }}/jenkins.repo"
-    dest: /etc/yum.repos.d/jenkins.repo mode=0644
+    dest: /etc/yum.repos.d/jenkins.repo
+    mode: 0644
   when: ansible_os_family == 'RedHat'
   tags: packages
 
